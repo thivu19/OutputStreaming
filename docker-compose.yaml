@@ -1,0 +1,12 @@
+services:
+  output-streaming:
+    build: .
+    container_name: output-streaming
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+    volumes:
+      - ./app:/app
+      - /app/src/node_modules
+    command: ["node", "/app/src/server.js"]
