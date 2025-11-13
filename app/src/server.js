@@ -32,12 +32,6 @@ app.post("/frame", (req, res) => {
   res.status(200).send("Frame received");
 });
 
-// Serve last known frame (optional)
-app.get("/latest-frame", (req, res) => {
-  if (!latestFrame) return res.status(404).send("No frame yet");
-  res.json({ frame: latestFrame });
-});
-
 // Serve main page
 app.get("/", (req, res) => {
   res.sendFile("index.html", { root: "public" });

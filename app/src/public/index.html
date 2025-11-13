@@ -6,8 +6,6 @@
     <title>Home - OutputStreaming</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="styles.css" rel="stylesheet">
-    <script type="text/javascript"
-        src="https://cdn.jsdelivr.net/npm/@clappr/player@latest/dist/clappr.plainhtml5.min.js"></script>
     <script src="script.js"></script>
 </head>
 
@@ -18,6 +16,15 @@
     <main>
         <h2 id="home">Home Page</h2>
         <img id="video-frame" alt="Live Stream" width="640" height="360">
+        Resolution:
+        <option>
+            <select id="resolution-select" onchange="changeResolution()">
+                <option value="360p">360p</option>
+                <option value="480p">480p</option>
+                <option value="720p">720p</option>
+                <option value="1080p">1080p</option>
+            </select>
+        </option>
     </main>
     <footer>
         &copy; Group 1. All rights reserved.
