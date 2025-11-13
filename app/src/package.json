@@ -1,13 +1,15 @@
 {
 	"name": "output-streaming",
 	"version": "1.0.0",
-	"description": "OutputStreaming Express server",
+	"description": "Output Streaming service connected to Kafka and PostgreSQL",
 	"main": "server.js",
 	"type": "module",
 	"scripts": {
 		"start": "node server.js"
 	},
 	"dependencies": {
-		"express": "^4.18.2"
+		"express": "^4.18.2",
+		"pg": "8.16.3",
+		"ws": "^8.16.0"
 	}
 }

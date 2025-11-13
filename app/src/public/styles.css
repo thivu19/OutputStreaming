@@ -40,16 +40,10 @@ footer {
     bottom: 0;
 }
 
-#player {
+#frame {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 300px; /* Adjust as needed for vertical centering */
     width: 100%;
-}
-
-#player video {
-    max-width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }

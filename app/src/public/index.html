@@ -6,8 +6,6 @@
     <title>Home - OutputStreaming</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="styles.css" rel="stylesheet">
-    <script type="text/javascript"
-        src="https://cdn.jsdelivr.net/npm/@clappr/player@latest/dist/clappr.plainhtml5.min.js"></script>
     <script src="script.js"></script>
 </head>
 
@@ -17,15 +15,16 @@
     </header>
     <main>
         <h2 id="home">Home Page</h2>
-        <div id="player"></div>
-        <!-- Dropdown for links -->
-        <div class="dropdown">
-            <label for="Streaming">Choose a stream:</label>
-            <select id="streaming" name="selectedStream">
-                <option value="link1">Link1</option>
-                <option value="link2">Link2</option>
+        <img id="frame" src="" alt="Waiting for frames..." />
+        Resolution:
+        <option>
+            <select id="resolution-select" onchange="changeResolution()">
+                <option value="360p">360p</option>
+                <option value="480p">480p</option>
+                <option value="720p">720p</option>
+                <option value="1080p">1080p</option>
             </select>
-        </div>
+        </option>
     </main>
     <footer>
         &copy; Group 1. All rights reserved.
