@@ -1,30 +1,31 @@
-// Example HLS stream (replace with .m3u8 URL)
 document.addEventListener('DOMContentLoaded', function() {
-    // Connect WebSocket automatically based on current host
-    const wsUrl = `ws://${window.location.host}`;
-    const ws = new WebSocket(wsUrl);
+    function startStreaming() {
+        // Connect WebSocket automatically based on current host
+        const wsUrl = `ws://${window.location.host}`;
+        const ws = new WebSocket(wsUrl);
 
-    const frameImg = document.getElementById("frame");
+        const frameImg = document.getElementById("frame");
 
-    ws.onopen = () => {
-    console.log("Connected to output streaming WebSocket");
-    };
+        ws.onopen = () => {
+        console.log("Connected to output streaming WebSocket");
+        };
 
-    ws.onmessage = (msg) => {
-    try {
-        const data = JSON.parse(msg.data);
+        ws.onmessage = (msg) => {
+        try {
+            const data = JSON.parse(msg.data);
 
-        // Only process frame packets
-        if (data.type === "frame" && data.data) {
-        // Base64 PNG → display in <img>
-        frameImg.src = `data:image/png;base64,${data.data}`;
+            // Only process frame packets
+            if (data.type === "frame" && data.data) {
+            // Base64 PNG → display in <img>
+            frameImg.src = `data:image/png;base64,${data.data}`;
+            }
+        } catch (e) {
+            console.error("Error parsing WS data:", e);
         }
-    } catch (e) {
-        console.error("Error parsing WS data:", e);
-    }
-    };
+        };
 
-    ws.onerror = (err) => {
-    console.error("WebSocket error:", err);
-    };
+        ws.onerror = (err) => {
+        console.error("WebSocket error:", err);
+        };
+    } 
 });

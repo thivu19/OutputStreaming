@@ -14,17 +14,22 @@
         <h1>Welcome to OutputStreaming</h1>
     </header>
     <main>
-        <h2 id="home">Home Page</h2>
+        <div>
+            Link:
+            <input type="text" id="link-input" placeholder="Enter stream link here" />
+            <button onclick="startStreaming()">Start Streaming</button>
+        </div>
+        <div>
+             Resolution:
+            <option>
+                <select id="resolution-select" onchange="changeResolution()">
+                    <option value="256p">256p</option>
+                    <option value="720p">720p</option>
+                    <option value="1080p">1080p</option>
+                </select>
+            </option>
+        </div>
         <img id="frame" src="" alt="Waiting for frames..." />
-        Resolution:
-        <option>
-            <select id="resolution-select" onchange="changeResolution()">
-                <option value="360p">360p</option>
-                <option value="480p">480p</option>
-                <option value="720p">720p</option>
-                <option value="1080p">1080p</option>
-            </select>
-        </option>
     </main>
     <footer>
         &copy; Group 1. All rights reserved.
