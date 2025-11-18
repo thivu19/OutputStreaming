@@ -14,6 +14,51 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const wss = new WebSocketServer({ noServer: true });
 let latestFrame = null;
 
+// 3 endpoint (480p, 720p, 1080p)
+// make function to filter NYC and bear (bear.png or NYC.png) capitalize everything and check
+// Endpoint for video processor to POST 480p frames
+app.post("/480p", (req, res) => {
+  const { frame } = req.body; // frame = base64 image or buffer
+  if (!frame) return res.status(400).send("Missing frame data");
+  latestFrame = frame;
+  console.log("Received new 480p frame");
+  // Broadcast to all connected WebSocket clients
+  wss.clients.forEach((client) => {
+    if (client.readyState === 1) {
+      client.send(JSON.stringify({ type: "frame", data: frame }));
+    }
+  }); 
+})
+
+// Endpoint for video processor to POST 720p frames
+app.post("/720p", (req, res) => {
+  const { frame } = req.body; // frame = base64 image or buffer
+  if (!frame) return res.status(400).send("Missing frame data");
+  latestFrame = frame;
+  console.log("Received new 720p frame");
+  // Broadcast to all connected WebSocket clients
+  wss.clients.forEach((client) => {
+    if (client.readyState === 1) {
+      client.send(JSON.stringify({ type: "frame", data: frame }));
+    }
+  }); 
+})
+
+// Endpoint for video processor to POST 1080p frames
+app.post("/1080p", (req, res) => {
+  const { frame } = req.body; // frame = base64 image or buffer
+  if (!frame) return res.status(400).send("Missing frame data");
+  latestFrame = frame;
+  console.log("Received new 1080p frame");
+  // Broadcast to all connected WebSocket clients
+  wss.clients.forEach((client) => {
+    if (client.readyState === 1) {
+      client.send(JSON.stringify({ type: "frame", data: frame }));
+    }
+  }); 
+})
+
+/*
 // Endpoint for video processor to POST frames
 app.post("/frame", (req, res) => {
   const { frame } = req.body; // frame = base64 image or buffer
@@ -31,6 +76,7 @@ app.post("/frame", (req, res) => {
 
   res.status(200).send("Frame received");
 });
+*/
 
 // Serve main page
 app.get("/", (req, res) => {

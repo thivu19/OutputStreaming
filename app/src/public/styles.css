@@ -12,13 +12,30 @@ header {
     text-align: center;
 }
 
-main {
-    padding: 2rem;
-    max-width: 800px;
-    margin: 2rem auto;
-    background: #fff;
+.row::after {
+    clear: both;
+}
+
+/*Height of columns*/
+.column {
+    min-height: 550px;             /* ensure columns have some height */
+}
+
+/*Left column*/
+.column.side {
+    width: 20%;
+    float: left;
+    background-color: #9da6ae;
+    padding: 10px;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/*Middle column*/
+.column.middle {
+    width: 75%;
+    float: left;
+    padding: 10px;
+    border-radius: 8px;
 }
 
 #home {
@@ -46,4 +63,45 @@ footer {
     align-items: center;
     min-height: 300px; /* Adjust as needed for vertical centering */
     width: 100%;
+}
+
+/* Stats Display */
+.stats {
+    padding: 20px 30px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.stat-value {
+    font-size: 25px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 10px;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+button {
+    text-align: center;
+    padding: 5px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 5px;
 }

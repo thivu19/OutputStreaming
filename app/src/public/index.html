@@ -13,24 +13,47 @@
     <header>
         <h1>Welcome to OutputStreaming</h1>
     </header>
-    <main>
-        <div>
-            Link:
-            <input type="text" id="link-input" placeholder="Enter stream link here" />
+    <div class="row">
+        <div class="column side">
             <button onclick="startStreaming()">Start Streaming</button>
-        </div>
-        <div>
-             Resolution:
-            <option>
+            <div>
+                Link:
+                <select id="livestream-select" onchange="changeLiveStream()">
+                    <option scr="https://www.youtube.com/watch?v=73-EekdVVU8" value="Bear">Bear</option>
+                    <option scr="https://www.youtube.com/watch?v=rnXIjl_Rzy4" value="NYC">NYC</option>
+                </select>
+            </div>
+            <div>
+                Resolution:
                 <select id="resolution-select" onchange="changeResolution()">
-                    <option value="256p">256p</option>
+                    <option value="256p">480p</option>
                     <option value="720p">720p</option>
                     <option value="1080p">1080p</option>
                 </select>
-            </option>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="frameCount">0</div>
+                    <div class="stat-label">Frames Received</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="fps">0</div>
+                    <div class="stat-label">FPS</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="latency">0ms</div>
+                    <div class="stat-label">Latency</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="resolution">-</div>
+                    <div class="stat-label">Resolution</div>
+                </div>
+            </div>
         </div>
-        <img id="frame" src="" alt="Waiting for frames..." />
-    </main>
+        <div class="column middle">
+            <img id="frame" src="" alt="Waiting for frames..." />
+        </div>
+    </div>
     <footer>
         &copy; Group 1. All rights reserved.
     </footer>

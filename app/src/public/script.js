@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const data = JSON.parse(msg.data);
 
-            // Only process frame packets
+            // Only process frame packets for a certain link
             if (data.type === "frame" && data.data) {
             // Base64 PNG → display in <img>
             frameImg.src = `data:image/png;base64,${data.data}`;
