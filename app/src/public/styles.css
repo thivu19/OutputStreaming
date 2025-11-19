@@ -27,6 +27,7 @@ header {
     float: left;
     background-color: #9da6ae;
     padding: 10px;
+    min-width: 250px;
 }
 
 /*Middle column*/
