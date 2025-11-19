@@ -24,11 +24,10 @@ function connectToStream() {
         ws.close();
     }
 
-    const stream = liveStreamSelect.value
     const resolution = resolutionSelect.value;
 
-    // Construct the endpoint path: e.g., /480p/nyc
-    const endpoint = `/${resolution}/${stream}`;
+    // Construct the endpoint path: e.g., /480p
+    const endpoint = `/${resolution}`;
 
     // Construct the full WebSocket URL
     const wsUrl = `ws://${window.location.host}${endpoint}`;
@@ -50,7 +49,7 @@ function connectToStream() {
         try {
             const data = JSON.parse(msg.data);
             if (data.frame) {
-                displayFrame(data.frame);
+                displayFrame(data.frame, data.tag); // Get frame and tag of the image
             }
             /* 
             // Only process frame packets for a certain link
@@ -73,8 +72,15 @@ function connectToStream() {
     };
 }
 
-// Display the frame stats
-function displayFrame(base64Frame) {
+// Display the frame stats and frame image
+function displayFrame(base64Frame, tag) {
+    const stream = liveStreamSelect.value;   
+    
+    // Only show frames matching the user-selected live stream
+    if (tag !== stream) {
+        return;     // Ignore this frame
+    }
+
     const now = Date.now();
     const latency = now - lastFrameTime;
     lastFrameTime = now;

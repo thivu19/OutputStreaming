@@ -11,7 +11,7 @@ app.use(express.static("public"));
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Store the latest frame for each stream (e.g., {"480p/nyc": base64_data})
+// Store the latest frame for each stream (e.g., {"480p": base64_data})
 const latestFrames = {};
 // Store clients by their stream endpoint
 const streamClients = {};
@@ -45,12 +45,18 @@ function handlePost(endpoint) {
 // make function to filter NYC and bear (bear.png or NYC.png) capitalize everything and check
 
 // REST endpoints for video processors to POST frames
+app.post("/480p", handlePost("480p"));
+app.post("/720p", handlePost("/720p"));
+app.post("/1080p", handlePost("/1080p"));
+
+/*
 app.post("/480p/nyc", handlePost("480p/nyc"));
 app.post("/480p/bears", handlePost("480p/bears"));
 app.post("/720p/nyc", handlePost("720p/nyc"));
 app.post("/720p/bears", handlePost("720p/bears"));
 app.post("/1080p/nyc", handlePost("1080p/nyc"));
 app.post("/1080p/bears", handlePost("1080p/bears"));
+*/
 
 /*
 // Endpoint for video processor to POST frames
