@@ -118,3 +118,13 @@ select {
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+
+button {
+    text-align: center;
+    padding: 5px 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 5px;
+    border-radius: 8px;
+}

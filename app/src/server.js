@@ -1,6 +1,7 @@
 import express from "express";
 import { WebSocketServer } from "ws";
 import bodyParser from "body-parser";
+import { URLSearchParams } from 'url';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -10,53 +11,46 @@ app.use(express.static("public"));
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Store the latest frame for each stream (e.g., {"480p/nyc": base64_data})
+const latestFrames = {};
+// Store clients by their stream endpoint
+const streamClients = {};
+
 // WebSocket setup
 const wss = new WebSocketServer({ noServer: true });
-let latestFrame = null;
+
+// Function to broadcast a frame to clients connected to a specific endpoint
+function broadcast(endpoint, frame) {
+    const clients = streamClients[endpoint] || [];
+    clients.forEach((client) => {
+        if (client.readyState === 1) { // 1 means OPEN
+            client.send(JSON.stringify({ frame: frame }));
+        }
+    });
+}
+
+// Function to handle a POST request and trigger broadcast
+function handlePost(endpoint) {
+    return (req, res) => {
+        const { frame } = req.body;
+        if (!frame) return res.status(400).send("Missing frame data");
+        latestFrames[endpoint] = frame;
+        console.log(`Received new frame for endpoint: ${endpoint}`);
+        broadcast(endpoint, frame);
+        res.status(200).send("Frame received");
+    };
+}
 
 // 3 endpoint (480p, 720p, 1080p)
 // make function to filter NYC and bear (bear.png or NYC.png) capitalize everything and check
-// Endpoint for video processor to POST 480p frames
-app.post("/480p", (req, res) => {
-  const { frame } = req.body; // frame = base64 image or buffer
-  if (!frame) return res.status(400).send("Missing frame data");
-  latestFrame = frame;
-  console.log("Received new 480p frame");
-  // Broadcast to all connected WebSocket clients
-  wss.clients.forEach((client) => {
-    if (client.readyState === 1) {
-      client.send(JSON.stringify({ type: "frame", data: frame }));
-    }
-  }); 
-})
 
-// Endpoint for video processor to POST 720p frames
-app.post("/720p", (req, res) => {
-  const { frame } = req.body; // frame = base64 image or buffer
-  if (!frame) return res.status(400).send("Missing frame data");
-  latestFrame = frame;
-  console.log("Received new 720p frame");
-  // Broadcast to all connected WebSocket clients
-  wss.clients.forEach((client) => {
-    if (client.readyState === 1) {
-      client.send(JSON.stringify({ type: "frame", data: frame }));
-    }
-  }); 
-})
-
-// Endpoint for video processor to POST 1080p frames
-app.post("/1080p", (req, res) => {
-  const { frame } = req.body; // frame = base64 image or buffer
-  if (!frame) return res.status(400).send("Missing frame data");
-  latestFrame = frame;
-  console.log("Received new 1080p frame");
-  // Broadcast to all connected WebSocket clients
-  wss.clients.forEach((client) => {
-    if (client.readyState === 1) {
-      client.send(JSON.stringify({ type: "frame", data: frame }));
-    }
-  }); 
-})
+// REST endpoints for video processors to POST frames
+app.post("/480p/nyc", handlePost("480p/nyc"));
+app.post("/480p/bears", handlePost("480p/bears"));
+app.post("/720p/nyc", handlePost("720p/nyc"));
+app.post("/720p/bears", handlePost("720p/bears"));
+app.post("/1080p/nyc", handlePost("1080p/nyc"));
+app.post("/1080p/bears", handlePost("1080p/bears"));
 
 /*
 // Endpoint for video processor to POST frames
@@ -124,9 +118,41 @@ const server = app.listen(PORT, () => {
 });
 
 server.on("upgrade", (req, socket, head) => {
-  wss.handleUpgrade(req, socket, head, (ws) => {
-    wss.emit("connection", ws, req);
-  });
+    const url = new URL(req.url, `http://${req.headers.host}`);
+    const path = url.pathname;
+
+    // Check if the requested path is a valid stream endpoint
+    if (Object.keys(latestFrames).includes(path.substring(1))) {
+        wss.handleUpgrade(req, socket, head, (ws) => {
+            wss.emit("connection", ws, req);
+            // Add the new client to the list for this specific stream
+            const endpoint = path.substring(1); // Remove leading "/"
+            if (!streamClients[endpoint]) {
+                streamClients[endpoint] = [];
+            }
+            streamClients[endpoint].push(ws);
+            console.log(`Client connected to WebSocket endpoint: ${path}`);
+
+            // Send the latest frame immediately on connection
+            if (latestFrames[endpoint]) {
+                ws.send(JSON.stringify({ frame: latestFrames[endpoint] }));
+            }
+
+            // Handle client disconnection
+            ws.on("close", () => {
+                const clients = streamClients[endpoint];
+                if (clients) {
+                    const index = clients.indexOf(ws);
+                    if (index > -1) {
+                        clients.splice(index, 1);
+                    }
+                }
+                console.log(`Client disconnected from WebSocket endpoint: ${path}`);
+            });
+        });
+    } else {
+        socket.destroy();
+    }
 });
 
 // 404 fallback

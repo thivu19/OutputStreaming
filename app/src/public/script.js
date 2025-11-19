@@ -1,6 +1,7 @@
 let frameCount = 0;
 let lastFrameTime = Date.now();
 let fpsArray = [];
+let ws = null; // Declare WebSocket globally to manage its state
 
 const frameImg = document.getElementById('frame');
 const frameCountEl = document.getElementById('frameCount');
@@ -8,21 +9,46 @@ const fpsEl = document.getElementById('fps');
 const latencyEl = document.getElementById('latency');
 const resolutionEl = document.getElementById('resolution');
 
+const liveStreamSelect = document.getElementById('livestream-select');
+const resolutionSelect = document.getElementById('resolution-select');
+const connectButton = document.getElementById('connectBttn');
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Connect WebSocket automatically based on current host
-    const wsUrl = `ws://${window.location.host}`;
-    const ws = new WebSocket(wsUrl);
+    connectButton.addEventListener('click', connectToStream);
+});
+
+function connectToStream() {
+    // If a connection already exists, close it first
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        console.log("Closing existing WebSocket connection.");
+        ws.close();
+    }
+
+    const stream = liveStreamSelect.value
+    const resolution = resolutionSelect.value;
+
+    // Construct the endpoint path: e.g., /480p/nyc
+    const endpoint = `/${resolution}/${stream}`;
+
+    // Construct the full WebSocket URL
+    const wsUrl = `ws://${window.location.host}${endpoint}`;
+    console.log(`Attempting to connect to: ${wsURL}`);
+    ws = new WebSocket(wsUrl);
 
     const frameImg = document.getElementById("frame");
 
     ws.onopen = () => {
         console.log("Connected to output streaming WebSocket");
+        // Reset stats on new connection
+        frameCount = 0;
+        fpsArray = [];
+        frameCountEl.textContent = '0';
+        resolutionEl.textContent = 'N/A';
     };
 
     ws.onmessage = (msg) => {
         try {
             const data = JSON.parse(msg.data);
-
             if (data.frame) {
                 displayFrame(data.frame);
             }
@@ -45,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ws.onclose = () => {
         console.log("WebSocket disconnected");
     };
-});
+}
 
 // Display the frame stats
 function displayFrame(base64Frame) {
@@ -73,6 +99,7 @@ function displayFrame(base64Frame) {
     if (!frameImg.onload) {
         frameImg.onload = () => {
             resolutionEl.textContent = frameImg.naturalWidth + 'x' + frameImg.naturalHeight;
+            frameImg.onload = null; // Remove handler after execution
         };
     }
 }
