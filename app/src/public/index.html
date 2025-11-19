@@ -15,7 +15,6 @@
     </header>
     <div class="row">
         <div class="column side">
-            <button onclick="startStreaming()">Start Streaming</button>
             <div class="container">
                 Link:
                 <select id="livestream-select" onchange="changeLiveStream()">
@@ -51,7 +50,8 @@
             </div>
         </div>
         <div class="column middle">
-            <img id="frame" src="" alt="Waiting for frames..." />
+            <img id="frame" alt="Detection frame"/>
+            <h3>Waiting for frames...</h3>
         </div>
     </div>
     <footer>

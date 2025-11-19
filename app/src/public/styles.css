@@ -59,11 +59,15 @@ footer {
 }
 
 #frame {
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     min-height: 300px; /* Adjust as needed for vertical centering */
     width: 100%;
+}
+
+#frame.active {
+    display: block;
 }
 
 /* Container */
@@ -113,14 +117,4 @@ select {
     color: #6c757d;
     text-transform: uppercase;
     letter-spacing: 1px;
-}
-
-button {
-    text-align: center;
-    padding: 5px 10px;
-    font-size: 16px;
-    font-weight: 700;
-    color: #667eea;
-    margin-bottom: 5px;
-    border-radius: 8px;
 }
