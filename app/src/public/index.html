@@ -13,19 +13,48 @@
     <header>
         <h1>Welcome to OutputStreaming</h1>
     </header>
-    <main>
-        <h2 id="home">Home Page</h2>
-        <img id="frame" src="" alt="Waiting for frames..." />
-        Resolution:
-        <option>
-            <select id="resolution-select" onchange="changeResolution()">
-                <option value="360p">360p</option>
-                <option value="480p">480p</option>
-                <option value="720p">720p</option>
-                <option value="1080p">1080p</option>
-            </select>
-        </option>
-    </main>
+    <div class="row">
+        <div class="column side">
+            <button id="connectBttn">Connect to Stream</button>
+            <div class="container">
+                Link:
+                <select id="livestream-select" onchange="changeLiveStream()">
+                    <option scr="https://www.youtube.com/watch?v=73-EekdVVU8" value="bears">Bears</option>
+                    <option scr="https://www.youtube.com/watch?v=rnXIjl_Rzy4" value="nyc">NYC</option>
+                </select>
+            </div>
+            <div class="container">
+                Resolution:
+                <select id="resolution-select" onchange="changeResolution()">
+                    <option value="256p">480p</option>
+                    <option value="720p">720p</option>
+                    <option value="1080p">1080p</option>
+                </select>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="frameCount">0</div>
+                    <div class="stat-label">Frames Received</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="fps">0</div>
+                    <div class="stat-label">FPS</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="latency">0ms</div>
+                    <div class="stat-label">Latency</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="resolution">-</div>
+                    <div class="stat-label">Resolution</div>
+                </div>
+            </div>
+        </div>
+        <div class="column middle">
+            <img id="frame" alt="Detection frame"/>
+            <h3>Waiting for frames...</h3>
+        </div>
+    </div>
     <footer>
         &copy; Group 1. All rights reserved.
     </footer>
