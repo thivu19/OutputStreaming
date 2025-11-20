@@ -41,10 +41,10 @@ function handlePost(endpoint) {
     };
 }
 
-// 3 endpoint (480p, 720p, 1080p)
+// 3 endpoint (256p, 720p, 1080p)
 
 // REST endpoints for video processors to POST frames
-app.post("/frame/480p", handlePost("/frame/480p"));
+app.post("/frame/256p", handlePost("/frame/256p"));
 app.post("/frame/720p", handlePost("/frame/720p"));
 app.post("/frame/1080p", handlePost("/frame/1080p"));
 
