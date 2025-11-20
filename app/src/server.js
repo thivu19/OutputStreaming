@@ -1,7 +1,6 @@
 import express from "express";
 import { WebSocketServer } from "ws";
 import bodyParser from "body-parser";
-import { URLSearchParams } from 'url';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
