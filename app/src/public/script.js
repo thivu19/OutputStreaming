@@ -26,12 +26,12 @@ function connectToStream() {
 
     const resolution = resolutionSelect.value;
 
-    // Construct the endpoint path: e.g., /480p
-    const endpoint = `/${resolution}`;
+    // Construct the endpoint path: e.g., /frame/480p
+    const endpoint = `/frame/${resolution}`;
 
     // Construct the full WebSocket URL
     const wsUrl = `ws://${window.location.host}${endpoint}`;
-    console.log(`Attempting to connect to: ${wsURL}`);
+    console.log(`Attempting to connect to: ${wsUrl}`);
     ws = new WebSocket(wsUrl);
 
     const frameImg = document.getElementById("frame");
@@ -98,7 +98,7 @@ function displayFrame(base64Frame, tag) {
     latencyEl.textContent = latency + 'ms';
 
     // Display image
-    frameImg.src = 'data:image/png;base64' + base64Frame;
+    frameImg.src = `data:image/png;base64,${base64Frame}`;
     frameImg.className = 'active';
     
     // Update resolution on first load

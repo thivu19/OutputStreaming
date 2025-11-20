@@ -43,9 +43,9 @@ function handlePost(endpoint) {
 // 3 endpoint (256p, 720p, 1080p)
 
 // REST endpoints for video processors to POST frames
-app.post("/frame/256p", handlePost("/frame/256p"));
-app.post("/frame/720p", handlePost("/frame/720p"));
-app.post("/frame/1080p", handlePost("/frame/1080p"));
+app.post("/frame/256p", handlePost("frame/256p"));
+app.post("/frame/720p", handlePost("frame/720p"));
+app.post("/frame/1080p", handlePost("frame/1080p"));
 
 /*
 app.post("/480p/nyc", handlePost("480p/nyc"));
@@ -123,18 +123,20 @@ const server = app.listen(PORT, () => {
 
 server.on("upgrade", (req, socket, head) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
-    const path = url.pathname;
+    const path = url.pathname;            // '/frame/256p'
+    const endpoint = path.substring(1);   // 'frame/256p'
 
     // Check if the requested path is a valid stream endpoint
-    if (Object.keys(latestFrames).includes(path.substring(1))) {
+    if (endpoint in latestFrames) {
         wss.handleUpgrade(req, socket, head, (ws) => {
             wss.emit("connection", ws, req);
+
             // Add the new client to the list for this specific stream
-            const endpoint = path.substring(1); // Remove leading "/"
             if (!streamClients[endpoint]) {
                 streamClients[endpoint] = [];
             }
             streamClients[endpoint].push(ws);
+
             console.log(`Client connected to WebSocket endpoint: ${path}`);
 
             // Send the latest frame immediately on connection
@@ -144,14 +146,10 @@ server.on("upgrade", (req, socket, head) => {
 
             // Handle client disconnection
             ws.on("close", () => {
-                const clients = streamClients[endpoint];
-                if (clients) {
-                    const index = clients.indexOf(ws);
-                    if (index > -1) {
-                        clients.splice(index, 1);
-                    }
-                }
-                console.log(`Client disconnected from WebSocket endpoint: ${path}`);
+                const clients = streamClients[endpoint] || [];
+                const index = clients.indexOf(ws);
+                if (index > -1) clients.splice(index, 1);
+                console.log(`Client disconnected: ${endpoint}`);
             });
         });
     } else {
