@@ -42,10 +42,9 @@ function handlePost(endpoint) {
 }
 
 // 3 endpoint (480p, 720p, 1080p)
-// make function to filter NYC and bear (bear.png or NYC.png) capitalize everything and check
 
 // REST endpoints for video processors to POST frames
-app.post("/480p", handlePost("480p"));
+app.post("/480p", handlePost("/480p"));
 app.post("/720p", handlePost("/720p"));
 app.post("/1080p", handlePost("/1080p"));
 
