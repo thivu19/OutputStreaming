@@ -3,6 +3,8 @@ let lastFrameTime = Date.now();
 let fpsArray = [];
 let ws = null; // Declare WebSocket globally to manage its state
 
+const waitingText = document.getElementById('waiting');
+
 const frameImg = document.getElementById('frame');
 const frameCountEl = document.getElementById('frameCount');
 const fpsEl = document.getElementById('fps');
@@ -34,8 +36,6 @@ function connectToStream() {
     console.log(`Attempting to connect to: ${wsUrl}`);
     ws = new WebSocket(wsUrl);
 
-    const frameImg = document.getElementById("frame");
-
     ws.onopen = () => {
         console.log("Connected to output streaming WebSocket");
         // Reset stats on new connection
@@ -48,16 +48,15 @@ function connectToStream() {
     ws.onmessage = (msg) => {
         try {
             const data = JSON.parse(msg.data);
-            if (data.frame) {
-                displayFrame(data.frame, data.tag); // Get frame and tag of the image
+
+            // New structure: { frame: { frame: "...", topic: "...", resolution: "..." } }
+            if (data.frame && data.frame.frame) {
+                displayFrame(
+                    data.frame.frame, 
+                    data.frame.topic, 
+                    data.frame.resolution
+                );
             }
-            /* 
-            // Only process frame packets for a certain link
-            if (data.type === "frame" && data.data) {
-                // Base64 PNG → display in <img>
-                frameImg.src = `data:image/png;base64,${data.data}`;
-            }
-            */
         } catch (e) {
             console.error("Error parsing WS data:", e);
         }
@@ -73,11 +72,13 @@ function connectToStream() {
 }
 
 // Display the frame stats and frame image
-function displayFrame(base64Frame, tag) {
+function displayFrame(base64Frame, topic, res) {
     const stream = liveStreamSelect.value;   
-    
+    console.log("Selected livestream: " + stream);
+    console.log("Sent livestream: " + topic);
+
     // Only show frames matching the user-selected live stream
-    if (tag !== stream) {
+    if (topic !== stream) {
         return;     // Ignore this frame
     }
 
@@ -99,13 +100,14 @@ function displayFrame(base64Frame, tag) {
 
     // Display image
     frameImg.src = `data:image/png;base64,${base64Frame}`;
-    frameImg.className = 'active';
+    frameImg.classList.add("active");
+
+    waitingText.classList.add("active");
     
-    // Update resolution on first load
-    if (!frameImg.onload) {
+    // Only set resolution once
+    if (frameCount === 1) {
         frameImg.onload = () => {
-            resolutionEl.textContent = frameImg.naturalWidth + 'x' + frameImg.naturalHeight;
-            frameImg.onload = null; // Remove handler after execution
+            resolutionEl.textContent = `${frameImg.naturalWidth}x${frameImg.naturalHeight}`;
         };
     }
 }

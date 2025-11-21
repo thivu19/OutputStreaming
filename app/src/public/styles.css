@@ -62,12 +62,20 @@ footer {
     display: none;
     justify-content: center;
     align-items: center;
-    min-height: 300px; /* Adjust as needed for vertical centering */
+    min-height: 150px; /* Adjust as needed for vertical centering */
     width: 100%;
 }
 
 #frame.active {
     display: block;
+}
+
+.waiting {
+    display: block;
+}
+
+.waiting.active {
+    display: none;
 }
 
 /* Container */

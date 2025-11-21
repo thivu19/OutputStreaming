@@ -23,7 +23,9 @@ function broadcast(endpoint, frame) {
     const clients = streamClients[endpoint] || [];
     clients.forEach((client) => {
         if (client.readyState === 1) { // 1 means OPEN
-            client.send(JSON.stringify({ frame: frame }));
+            client.send(JSON.stringify({
+                frame: frame     // includes frame, topic, resolution
+            }));
         }
     });
 }
@@ -31,50 +33,29 @@ function broadcast(endpoint, frame) {
 // Function to handle a POST request and trigger broadcast
 function handlePost(endpoint) {
     return (req, res) => {
-        const { frame } = req.body;
+        const { frame, topic, resolution } = req.body;
         if (!frame) return res.status(400).send("Missing frame data");
-        latestFrames[endpoint] = frame;
-        console.log(`Received new frame for endpoint: ${endpoint}`);
-        broadcast(endpoint, frame);
+        
+        latestFrames[endpoint] = {
+          frame,
+          topic,
+          resolution
+        };
+        
+        console.log(
+            `Received frame for ${endpoint} (resolution=${resolution}, topic=${topic})`
+        );
+
+        broadcast(endpoint, latestFrames[endpoint]);
         res.status(200).send("Frame received");
     };
 }
 
 // 3 endpoint (256p, 720p, 1080p)
-
 // REST endpoints for video processors to POST frames
 app.post("/frame/256p", handlePost("frame/256p"));
 app.post("/frame/720p", handlePost("frame/720p"));
 app.post("/frame/1080p", handlePost("frame/1080p"));
-
-/*
-app.post("/480p/nyc", handlePost("480p/nyc"));
-app.post("/480p/bears", handlePost("480p/bears"));
-app.post("/720p/nyc", handlePost("720p/nyc"));
-app.post("/720p/bears", handlePost("720p/bears"));
-app.post("/1080p/nyc", handlePost("1080p/nyc"));
-app.post("/1080p/bears", handlePost("1080p/bears"));
-*/
-
-/*
-// Endpoint for video processor to POST frames
-app.post("/frame", (req, res) => {
-  const { frame } = req.body; // frame = base64 image or buffer
-  if (!frame) return res.status(400).send("Missing frame data");
-
-  latestFrame = frame;
-  console.log("Received new frame");
-
-  // Broadcast to all connected WebSocket clients
-  wss.clients.forEach((client) => {
-    if (client.readyState === 1) {
-      client.send(JSON.stringify({ type: "frame", data: frame }));
-    }
-  });
-
-  res.status(200).send("Frame received");
-});
-*/
 
 // Serve main page
 app.get("/", (req, res) => {
@@ -141,7 +122,9 @@ server.on("upgrade", (req, socket, head) => {
 
             // Send the latest frame immediately on connection
             if (latestFrames[endpoint]) {
-                ws.send(JSON.stringify({ frame: latestFrames[endpoint] }));
+                ws.send(JSON.stringify({
+                    frame: latestFrames[endpoint]
+                }));
             }
 
             // Handle client disconnection
