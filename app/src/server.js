@@ -1,6 +1,8 @@
 import express from "express";
 import { WebSocketServer } from "ws";
 import bodyParser from "body-parser";
+import fs from "fs";
+import path from "path";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -15,8 +17,56 @@ const latestFrames = {};
 // Store clients by their stream endpoint
 const streamClients = {};
 
+// ----------------------------------------------------
+// Count of frames processed in the last interval
+let framesProcessed = 0;
+// Unique POD ID provided by Kubernetes
+const POD_ID = process.env.POD_ID || "unknown";
+// Directory for logs (mounted PVC)
+const OUTPUT_DIR = "/data/output";
+
+// Make directory if it doesn't exist
+if (!fs.existsSync(OUTPUT_DIR)) {
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+}
+
+// Log file for THIS pod
+const LOG_FILE = path.join(OUTPUT_DIR, `${POD_ID}_Throughput.txt`);
+
+function getDatetimeString() {
+    return new Date().toISOString().replace("T", " ").split(".")[0];
+}
+
+// Start logging 
+logThroughput();
+
+// Schedule next log
+console.log("10 sec has pass");
+setInterval(logThroughput, 10000); // 10 seconds
+
+function logThroughput() {
+    const count = framesProcessed;
+    framesProcessed = 0; // Reset counter
+
+    const logLine = `[${getDatetimeString()}] Processed ${count} frames\n`;
+
+    // Attempt to create file if not exists, else append
+    fs.writeFile(LOG_FILE, logLine, { flag: "a" }, (err) => {
+        if (err) console.error("Error writing throughput log:", err);
+    });
+}
+// -----------------------------------------------------
+
 // WebSocket setup
 const wss = new WebSocketServer({ noServer: true });
+
+// PRE-REGISTER all valid stream endpoints
+const VALID_ENDPOINTS = ["frame/256p", "frame/720p", "frame/1080p"];
+
+VALID_ENDPOINTS.forEach((ep) => {
+    latestFrames[ep] = null;     // allow WebSocket to connect even before first frame
+    streamClients[ep] = [];      // initialize client list
+});
 
 // Function to broadcast a frame to clients connected to a specific endpoint
 function broadcast(endpoint, frame) {
@@ -35,6 +85,8 @@ function handlePost(endpoint) {
     return (req, res) => {
         const { frame, topic, resolution } = req.body;
         if (!frame) return res.status(400).send("Missing frame data");
+
+        framesProcessed++;
         
         latestFrames[endpoint] = {
           frame,
@@ -104,35 +156,27 @@ const server = app.listen(PORT, () => {
 
 server.on("upgrade", (req, socket, head) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
-    const path = url.pathname;            // '/frame/256p'
-    const endpoint = path.substring(1);   // 'frame/256p'
+    const path = url.pathname;            // '/frame/720p'
+    const endpoint = path.substring(1);   // 'frame/720p'
 
-    // Check if the requested path is a valid stream endpoint
-    if (endpoint in latestFrames) {
+    if (VALID_ENDPOINTS.includes(endpoint)) {
         wss.handleUpgrade(req, socket, head, (ws) => {
             wss.emit("connection", ws, req);
 
-            // Add the new client to the list for this specific stream
-            if (!streamClients[endpoint]) {
-                streamClients[endpoint] = [];
-            }
             streamClients[endpoint].push(ws);
+            console.log(`Client connected to WebSocket endpoint: ${endpoint}`);
 
-            console.log(`Client connected to WebSocket endpoint: ${path}`);
-
-            // Send the latest frame immediately on connection
+            // Send latest frame IF EXISTS
             if (latestFrames[endpoint]) {
                 ws.send(JSON.stringify({
                     frame: latestFrames[endpoint]
                 }));
             }
 
-            // Handle client disconnection
             ws.on("close", () => {
-                const clients = streamClients[endpoint] || [];
-                const index = clients.indexOf(ws);
-                if (index > -1) clients.splice(index, 1);
-                console.log(`Client disconnected: ${endpoint}`);
+                const clients = streamClients[endpoint];
+                streamClients[endpoint] = clients.filter(c => c !== ws);
+                console.log(`WebSocket disconnected: ${endpoint}`);
             });
         });
     } else {

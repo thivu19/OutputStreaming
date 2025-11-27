@@ -12,6 +12,10 @@ spec:
       labels:
         app: outputstreaming
     spec:
+      volumes:
+        - name: kafka-storage
+          persistentVolumeClaim:
+            claimName: image-storage-pvc
       containers:
         - name: output-streaming
           image: thivu19/output-streaming:latest
@@ -42,6 +46,10 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD  
+            - name: POD_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           resources:
             requests:
               cpu: "250m"
@@ -49,3 +57,6 @@ spec:
             limits:
               cpu: "500m"
               memory: "256Mi"
+          volumeMounts:
+            - name: kafka-storage
+              mountPath: /data/output
