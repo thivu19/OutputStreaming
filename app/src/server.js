@@ -20,8 +20,9 @@ const streamClients = {};
 // ----------------------------------------------------
 // Count of frames processed in the last interval
 let framesProcessed = 0;
+let logged = false;
 // Unique POD ID provided by Kubernetes
-const POD_ID = process.env.POD_ID || "unknown";
+const POD_ID = Math.random().toString() || "unknown";
 // Directory for logs (mounted PVC)
 const OUTPUT_DIR = "/data/output";
 
@@ -37,23 +38,24 @@ function getDatetimeString() {
     return new Date().toISOString().replace("T", " ").split(".")[0];
 }
 
-// Start logging 
-logThroughput();
-
-// Schedule next log
-console.log("10 sec has pass");
-setInterval(logThroughput, 10000); // 10 seconds
+// Attempt to create file if not exists, else append
+  fs.writeFile(LOG_FILE, "\n", { flag: "w" }, (err) => {
+      if (err) console.error("Error creating throughput log:", err);
+  });
 
 function logThroughput() {
+    logged = false;
     const count = framesProcessed;
     framesProcessed = 0; // Reset counter
 
     const logLine = `[${getDatetimeString()}] Processed ${count} frames\n`;
-
+    
     // Attempt to create file if not exists, else append
     fs.writeFile(LOG_FILE, logLine, { flag: "a" }, (err) => {
         if (err) console.error("Error writing throughput log:", err);
     });
+    console.log("Write log");
+    console.log(LOG_FILE);
 }
 // -----------------------------------------------------
 
@@ -97,6 +99,13 @@ function handlePost(endpoint) {
         console.log(
             `Received frame for ${endpoint} (resolution=${resolution}, topic=${topic})`
         );
+
+        if (!logged) {
+          logged = true;
+          // Schedule next log
+          console.log("10 sec has pass");
+          setTimeout(logThroughput, 10000); // 10 seconds
+        }
 
         broadcast(endpoint, latestFrames[endpoint]);
         res.status(200).send("Frame received");
