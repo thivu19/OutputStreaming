@@ -1,4 +1,4 @@
-#Distributed Data Processing & Workflow Deployment
+# Distributed Data Processing & Workflow Deployment
 
 This project’s purpose is to explore the use of Kubernetes and the tools it provides for deploying cloud-based solutions. This entails creating a distributed workflow to execute in multiple containers and test the effectiveness 
 of different cloud mechanisms, such as cloud architecture, component scheduling, and resource allocation, for the given workflow. 
@@ -10,40 +10,40 @@ This project will utilize all the aforementioned background knowledge by testing
 associated with Kubernetes. Then, the deployment must be created, and the components must be connected using Kubernetes mechanisms like Services and Ingresses. Finally, the above topics come into play in optimizing the performance 
 of the deployment. 
 
-##References to run the project
+## References to run the project
 
-##Build Image - In Application
+## Build Image - In Application
 docker build -t [repo_name]/output-streaming:latest .
 
-##Push Image - In Application
+## Push Image - In Application
 docker push [repo_name]/output-streaming:latest
 
-##Run Image on Port 8080 - In Application
+## Run Image on Port 8080 - In Application
 docker run -p 8080:8080 [repo_name]/output-streaming:latest
 
-##Pull Image - In VM
+## Pull Image - In VM
 docker pull [repo_name]/output-streaming:latest
 
-##Update deployment on VM
+## Update deployment on VM
 sudo k3s kubectl set image deployment/outputstreaming-deployment \ output-streaming=thivu19/output-streaming:latest
 
-#Redeploy
+## Redeploy
 sudo k3s kubectl rollout restart deployment/outputstreaming-deployment
 
-##Check image on VM
+## Check image on VM
 sudo docker images
 sudo k3s kubectl describe pod <pod-name> | grep Image:
 
-##Edit yaml file (in directory)
+## Edit yaml file (in directory)
 sudo nano [filename].yaml
 
-##Apply yaml file (in directory)
+## Apply yaml file (in directory)
 sudo k3s kubectl apply -f [filename].yaml
 
-##Get information about nodes
+## Get information about nodes
 sudo k3s kubectl describe nodes
 
-##Get your VM IP => Cloud VM (AWS/Azure/GCP)
+## Get your VM IP => Cloud VM (AWS/Azure/GCP)
 This allows you to open up the page on your local machine to view when deployed on the VM.
 
 Check the Public IPv4 or External IP in your VM dashboard.
@@ -74,5 +74,5 @@ Example:
 
 Save and exit.
 
-##URL link to open up the frontend
+## URL link to open up the frontend
 http://outputstreaming.local/index.html
