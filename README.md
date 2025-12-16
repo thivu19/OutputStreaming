@@ -25,7 +25,7 @@ docker run -p 8080:8080 [repo_name]/output-streaming:latest
 docker pull [repo_name]/output-streaming:latest
 
 ## Update deployment on VM
-sudo k3s kubectl set image deployment/outputstreaming-deployment \ output-streaming=thivu19/output-streaming:latest
+sudo k3s kubectl set image deployment/outputstreaming-deployment \ output-streaming=[repo_name]/output-streaming:latest
 
 ## Redeploy
 sudo k3s kubectl rollout restart deployment/outputstreaming-deployment
