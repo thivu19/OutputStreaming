@@ -10,7 +10,7 @@ This project will utilize all the aforementioned background knowledge by testing
 associated with Kubernetes. Then, the deployment must be created, and the components must be connected using Kubernetes mechanisms like Services and Ingresses. Finally, the above topics come into play in optimizing the performance 
 of the deployment. 
 
-## References to run the project
+# References to run the project
 
 ## Build Image - In Application
 docker build -t [repo_name]/output-streaming:latest .
